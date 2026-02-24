@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A Time Table of History</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
+    <style>
+        :root { 
+            --axis-bg: #fff; 
+            --text-color: #333;
+            --line-color: #eee;
+            --header-height: 80px;
+        }
+        
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; font-family: "Times New Roman", serif; }
+        
+        #main-layout {
+            display: grid;
+            grid-template-columns: 90px 1fr; 
+            
+            grid-template-rows: var(--header-height) 35px 1fr 15vh; 
+            
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #header {
+            grid-column: 1 / span 2;
+            grid-row: 1;
+            display: flex;
+            align-items: baseline;
+            padding: 20px 80px;
+            border-bottom: 2px solid #000;
+            background: #fff;
+            z-index: 102;
+        }
+        .openseadragon-canvas {
+            outline: none !important;
+        }
+        #header h1 {
+            margin: 0;
+            font-size: 36px;
+            font-weight: normal;
+            color: #4a2c1d; 
+            margin-right: 30px;
+        }
+
+        #header p {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        #top-axis { 
+            grid-column: 2; 
+            background: var(--axis-bg); 
+            position: relative; 
+            z-index: 1000;
+            overflow: visible;
+            display: flex;
+            align-items: center; 
+            border-bottom: 1px solid #ddd; 
+        }
+
+
+        #left-axis { 
+            grid-column: 1;
+            grid-row: 3; 
+            background: var(--axis-bg); 
+            position: relative; 
+            z-index: 100;
+        }
+
+        #corner { 
+            grid-column: 1;
+            grid-row: 2;
+            background: #fff; 
+            z-index: 101;
+        }
+
+        #viewer-container {
+            grid-column: 2;
+            grid-row: 3;
+            background: #fff;
+            position: relative;
+            outline: none; 
+        }
+
+        #bottom-nav-row {
+            grid-column: 1 / span 2;
+            grid-row: 4;
+            background: #fff;
+            border-top: 1px solid #333;
+            display: flex; 
+            justify-content: flex-start; 
+            align-items: center;
+            padding-left: 10px; 
+        }
+
+        .axis-label {
+            position: absolute; 
+            color: var(--text-color); 
+            font-size: 16px;
+            white-space: nowrap;
+            pointer-events: auto; 
+            user-select: text;
+            -webkit-user-select: text;
+        }
+        
+        .year-label { right: 20px; line-height: 1; font-size: 20px;}
+        
+        .cat-label { 
+            padding-left: 10px;
+            border-left: 2px solid #333;
+            font-size: 18px;
+        }
+
+        #navigator-box {
+            height: 90% !important;
+            aspect-ratio: 11830 / 2609;
+            display: flex !important;
+            justify-content: flex-start !important; 
+            align-items: center;
+            top: 5%;
+            margin-left: 1% !important;
+            background-color: #fff !important;
+        }
+        .openseadragon-container {
+            margin-left: 0 !important;
+            margin-right: auto !important;
+            left: 0 !important;
+            text-align: left !important;
+            background: transparent !important; 
+        }
+        @media (max-width: 767px) {
+            html, body {
+                height: 100dvh;
+                width: 100vw;
+                position: fixed; 
+            }
+
+            #main-layout {
+                display: grid;
+                grid-template-columns: 1fr;
+                grid-template-rows: 100px 40px 1fr 0px; 
+                height: 100dvh;
+                width: 100vw;
+            }
+
+            #viewer-container {
+                grid-row: 3;
+                grid-column: 1;
+                height: 100% !important; 
+                width: 100% !important;
+                min-height: 1px; 
+                display: block !important;
+                position: relative;
+            }
+
+            #header {
+                flex-direction: column; 
+                align-items: flex-start;
+                justify-content: center;
+                padding: 10px 20px;
+            }
+
+            #header h1 {
+                font-size: 24px; 
+                margin-bottom: 4px;
+                font-weight: bold;
+            }
+
+            #header p {
+                font-size: 14px;
+                color: #666;
+            }
+            #top-axis {
+                grid-row: 2;
+                grid-column: 1; 
+                display: block !important;
+                visibility: visible !important;
+                height: 40px;
+            }
+
+            /* 坐标轴文字大小优化 */
+            #left-axis {
+                grid-column: 1;
+                grid-row: 3;
+                background: #fff;
+                position: relative;
+                z-index: 101;
+                width: 40px; 
+                border-right: 1px solid #eee; 
+            }
+
+            .year-label {
+                right: 10px; 
+                white-space: nowrap;
+                font-size: 12px;
+            }
+            .cat-label {
+                font-size: 16px; 
+                padding-left: 8px;
+                font-weight: 500;
+            }
+            #corner { 
+                grid-column: 1;
+                grid-row: 2;
+                background: #fff;
+                z-index: 102;
+                border-bottom: 1px solid #ddd;
+                border-right: 1px solid #ddd;
+            }
+            #bottom-nav-row, #navigator-box {
+                display: none !important;
+                height: 0;
+                visibility: hidden;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="main-layout">
+    <div id="header">
+        <h1>A Timetable of History</h1>
+        <p>A Horizontal Linked History Page</p>
+    </div>
+
+    <div id="corner"></div>
+    <div id="top-axis"></div>
+    <div id="left-axis"></div>
+    <div id="viewer-container"></div>
+    <div id="bottom-nav-row">
+        <div id="navigator-box"></div>
+    </div>
+</div>
+
+<script>
+    const isMobile = window.innerWidth < 768;
+    console.log(window.innerWidth)
+    const timelineData = {
+         years: [
+            { label: "1501", y: 0.02 },
+            { label: "1502", y: 0.06 },
+            { label: "1503", y: 0.11 },
+            { label: "1504", y: 0.15 },
+            { label: "1505", y: 0.19 }
+        ],
+
+        categories: [
+            { label: "History / Politic", x: 0 },
+            { label: "Literature / Theater", x: 0.151 },
+            { label: "Visual Arts", x: 0.293 },
+            { label: "Religion, Philosophy, Learning", x: 0.458 },
+            { label: "Science/Technology/Growth", x: 0.612 },
+            { label: "Music", x: 0.767 },
+            { label: "Science", x: 0.878 }
+        ]
+    };
+
+    const viewer = OpenSeadragon({
+        id: "viewer-container",
+        prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
+        tileSources: 'THESIS_ouput.dzi',
+        
+        animationTime: 1.0,
+        springStiffness: 12,
+        visibilityRatio: 1.0,
+        constrainDuringPan: true,
+        minZoomImageRatio: 1.0,
+        autoResize: true,
+        navigatorTileSources: {
+            type: 'image',
+            url: 'THESIS.png' 
+        },
+        gestureSettingsTouch: {
+            pinchRotate: false,
+            clickToZoom: true,
+            dblClickToZoom: true,
+            flickEnabled: true
+        },
+        showNavigationControl: false,
+        showNavigator: !isMobile,
+        navigatorId: isMobile ? null : "navigator-box",
+        navigatorDisplayRegionColor: 'rgba(255, 0, 0, 0.5)', 
+        navigatorBorderColor: '#ff0000',              
+        navigatorDisplayRegionBorderWidth: 2,          
+    });
+
+    const leftAxis = document.getElementById('left-axis');
+    const topAxis = document.getElementById('top-axis');
+
+    function initLabels() {
+        leftAxis.innerHTML = '';
+        topAxis.innerHTML = '';
+
+        timelineData.years.forEach(d => {
+            const div = document.createElement('div');
+            div.className = 'axis-label year-label';
+            div.innerText = d.label;
+            leftAxis.appendChild(div);
+            d.el = div;
+        });
+
+        timelineData.categories.forEach(d => {
+            const div = document.createElement('div');
+            div.className = 'axis-label cat-label';
+            div.innerText = d.label;
+            topAxis.appendChild(div);
+            d.el = div;
+        });
+    }
+
+    function updateAxis() {
+        if (!viewer.viewport) return;
+        const viewport = viewer.viewport;
+        const bounds = viewport.getBounds();
+
+        if (bounds.y < 0) {
+            viewport.fitBounds(new OpenSeadragon.Rect(bounds.x, 0, bounds.width, bounds.height), false);
+        }
+
+        window.requestAnimationFrame(() => {
+            timelineData.years.forEach(d => {
+                if (d.el) { 
+                    const imgPoint = new OpenSeadragon.Point(0, d.y);
+                    const pixelPoint = viewport.pixelFromPoint(imgPoint, true);
+                    d.el.style.transform = `translateY(${pixelPoint.y}px)`;
+                    d.el.style.display = (pixelPoint.y < -30 || pixelPoint.y > leftAxis.offsetHeight) ? 'none' : 'block';
+                }
+            });
+
+            timelineData.categories.forEach(d => {
+                if (d.el) {
+                    const imgPoint = new OpenSeadragon.Point(d.x, 0);
+                    const pixelPoint = viewport.pixelFromPoint(imgPoint, true);
+                    d.el.style.transform = `translateX(${pixelPoint.x}px)`;
+                    d.el.style.display = (pixelPoint.x < -100 || pixelPoint.x > topAxis.offsetWidth + 10) ? 'none' : 'block';
+                }
+            });
+        });
+    }
+
+    viewer.addHandler('open', () => {
+        initLabels();
+        
+        const viewport = viewer.viewport;
+        setTimeout(() => {
+            viewer.viewport.setCanvasSize();
+        }, 100);
+        const containerAspect = viewport.getAspectRatio();
+        viewport.fitBounds(new OpenSeadragon.Rect(0, 0, 1, 1 / containerAspect), true);
+        updateAxis();
+    });
+
+    viewer.addHandler('animation', updateAxis);
+    viewer.addHandler('canvas-scroll', updateAxis);
+    viewer.addHandler('canvas-drag', updateAxis);
+    viewer.addHandler('viewport-change', updateAxis);
+    window.addEventListener('resize', updateAxis);
+
+</script>
+</body>
+</html>
