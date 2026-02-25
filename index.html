@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>A Time Table of History</title>
+    <title>Historical Timeline Viewer Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
     <style>
         :root { 
@@ -11,16 +12,24 @@
             --text-color: #333;
             --line-color: #eee;
             --header-height: 80px;
+            /* 定义全局字体变量 */
+            --font-main: 'Crimson Text', "Times New Roman", serif;
         }
         
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; font-family: "Times New Roman", serif; }
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            width: 100%; 
+            height: 100%; 
+            overflow: hidden; 
+            background: #fff; 
+            font-family: var(--font-main); 
+        }
         
         #main-layout {
             display: grid;
             grid-template-columns: 90px 1fr; 
-            
             grid-template-rows: var(--header-height) 35px 1fr 15vh; 
-            
             width: 100vw;
             height: 100vh;
         }
@@ -35,21 +44,21 @@
             background: #fff;
             z-index: 102;
         }
-        .openseadragon-canvas {
-            outline: none !important;
-        }
+
         #header h1 {
             margin: 0;
-            font-size: 36px;
-            font-weight: normal;
-            color: #4a2c1d; 
+            font-family: var(--font-main);
+            font-size: 38px;
+            font-weight: 700;
+            color: #4a2c1d;
             margin-right: 30px;
+            letter-spacing: 0.5px;
         }
 
         #header p {
             margin: 0;
-            font-size: 18px;
-            color: #333;
+            font-size: 20px;
+            color: #555;
         }
 
         #top-axis { 
@@ -57,12 +66,11 @@
             background: var(--axis-bg); 
             position: relative; 
             z-index: 1000;
-            overflow: visible;
+            overflow: visible; 
             display: flex;
             align-items: center; 
-            border-bottom: 1px solid #ddd; 
+            border-bottom: 1px solid #ddd;
         }
-
 
         #left-axis { 
             grid-column: 1;
@@ -78,13 +86,19 @@
             background: #fff; 
             z-index: 101;
         }
+        canvas {
+            outline: none;
+        }
 
         #viewer-container {
             grid-column: 2;
             grid-row: 3;
             background: #fff;
             position: relative;
-            outline: none; 
+            outline: none !important;
+        }
+        #viewer-container :focus {
+            outline: none !important;
         }
 
         #bottom-nav-row {
@@ -93,32 +107,35 @@
             background: #fff;
             border-top: 1px solid #333;
             display: flex; 
-            justify-content: flex-start; 
+            justify-content: flex-start;
             align-items: center;
-            padding-left: 10px; 
+            padding-left: 10px;
         }
 
         .axis-label {
             position: absolute; 
             color: var(--text-color); 
-            font-size: 16px;
+            font-family: var(--font-main);
             white-space: nowrap;
             pointer-events: auto; 
             user-select: text;
-            -webkit-user-select: text;
         }
         
-        .year-label { right: 20px; line-height: 1; font-size: 20px;}
+        .year-label { 
+            right: 20px; 
+            line-height: 1; 
+            font-size: 19px;
+        }
         
         .cat-label { 
-            padding-left: 10px;
+            padding-left: 5px;
             border-left: 2px solid #333;
-            font-size: 18px;
+            font-size: 19px;
         }
 
         #navigator-box {
             height: 90% !important;
-            aspect-ratio: 11830 / 2609;
+            aspect-ratio: 10701 / 2585;
             display: flex !important;
             justify-content: flex-start !important; 
             align-items: center;
@@ -126,47 +143,22 @@
             margin-left: 1% !important;
             background-color: #fff !important;
         }
-        .openseadragon-container {
-            margin-left: 0 !important;
-            margin-right: auto !important;
-            left: 0 !important;
-            text-align: left !important;
-            background: transparent !important; 
-        }
+
         @media (max-width: 767px) {
-            html, body {
-                height: 100dvh;
-                width: 100vw;
-                position: fixed; 
-            }
-
             #main-layout {
-                display: grid;
-                grid-template-columns: 1fr;
                 grid-template-rows: 100px 40px 1fr 0px; 
-                height: 100dvh;
-                width: 100vw;
-            }
-
-            #viewer-container {
-                grid-row: 3;
-                grid-column: 1;
-                height: 100% !important; 
-                width: 100% !important;
-                min-height: 1px; 
-                display: block !important;
-                position: relative;
             }
 
             #header {
-                flex-direction: column; 
+                flex-direction: column;
                 align-items: flex-start;
                 justify-content: center;
                 padding: 10px 20px;
             }
 
+
             #header h1 {
-                font-size: 24px; 
+                font-size: 24px;
                 margin-bottom: 4px;
                 font-weight: bold;
             }
@@ -175,48 +167,10 @@
                 font-size: 14px;
                 color: #666;
             }
-            #top-axis {
-                grid-row: 2;
-                grid-column: 1; 
-                display: block !important;
-                visibility: visible !important;
-                height: 40px;
-            }
 
-            /* 坐标轴文字大小优化 */
-            #left-axis {
-                grid-column: 1;
-                grid-row: 3;
-                background: #fff;
-                position: relative;
-                z-index: 101;
-                width: 40px; 
-                border-right: 1px solid #eee; 
-            }
-
-            .year-label {
-                right: 10px; 
-                white-space: nowrap;
-                font-size: 12px;
-            }
-            .cat-label {
-                font-size: 16px; 
-                padding-left: 8px;
-                font-weight: 500;
-            }
-            #corner { 
-                grid-column: 1;
-                grid-row: 2;
-                background: #fff;
-                z-index: 102;
-                border-bottom: 1px solid #ddd;
-                border-right: 1px solid #ddd;
-            }
-            #bottom-nav-row, #navigator-box {
-                display: none !important;
-                height: 0;
-                visibility: hidden;
-            }
+            #left-axis { width: 45px; }
+            .year-label { font-size: 14px; right: 8px; }
+            .cat-label { font-size: 16px; }
         }
     </style>
 </head>
@@ -243,20 +197,20 @@
     const timelineData = {
          years: [
             { label: "1501", y: 0.02 },
-            { label: "1502", y: 0.06 },
-            { label: "1503", y: 0.11 },
-            { label: "1504", y: 0.15 },
-            { label: "1505", y: 0.19 }
+            { label: "1502", y: 0.07 },
+            { label: "1503", y: 0.115 },
+            { label: "1504", y: 0.165 },
+            { label: "1505", y: 0.21 }
         ],
 
         categories: [
             { label: "History / Politic", x: 0 },
-            { label: "Literature / Theater", x: 0.151 },
-            { label: "Visual Arts", x: 0.293 },
-            { label: "Religion, Philosophy, Learning", x: 0.458 },
-            { label: "Science/Technology/Growth", x: 0.612 },
-            { label: "Music", x: 0.767 },
-            { label: "Science", x: 0.878 }
+            { label: "Literature / Theater", x: 0.165 },
+            { label: "Visual Arts", x: 0.324 },
+            { label: "Religion, Philosophy, Learning", x: 0.443 },
+            { label: "Science/Technology/Growth", x: 0.583 },
+            { label: "Music", x: 0.742 },
+            { label: "Science", x: 0.858 }
         ]
     };
 
@@ -269,8 +223,8 @@
         springStiffness: 12,
         visibilityRatio: 1.0,
         constrainDuringPan: true,
-        minZoomImageRatio: 1.0,
-        autoResize: true,
+        minZoomImageRatio: isMobile ? 3.0 : 1.0,
+        autoResize: true, 
         navigatorTileSources: {
             type: 'image',
             url: 'THESIS.png' 
@@ -284,9 +238,9 @@
         showNavigationControl: false,
         showNavigator: !isMobile,
         navigatorId: isMobile ? null : "navigator-box",
-        navigatorDisplayRegionColor: 'rgba(255, 0, 0, 0.5)', 
-        navigatorBorderColor: '#ff0000',              
-        navigatorDisplayRegionBorderWidth: 2,          
+        navigatorDisplayRegionColor: 'rgba(255, 0, 0, 0.5)',
+        navigatorBorderColor: '#ff0000',                
+        navigatorDisplayRegionBorderWidth: 2,            
     });
 
     const leftAxis = document.getElementById('left-axis');
@@ -347,11 +301,16 @@
         initLabels();
         
         const viewport = viewer.viewport;
+        
+        
+
         setTimeout(() => {
             viewer.viewport.setCanvasSize();
         }, 100);
+
         const containerAspect = viewport.getAspectRatio();
         viewport.fitBounds(new OpenSeadragon.Rect(0, 0, 1, 1 / containerAspect), true);
+        
         updateAxis();
     });
 
