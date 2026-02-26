@@ -223,7 +223,7 @@
         springStiffness: 12,
         visibilityRatio: 1.0,
         constrainDuringPan: true,
-        minZoomImageRatio: isMobile ? 3.0 : 1.0,
+        minZoomImageRatio: isMobile ? 5.0 : 1.0,
         autoResize: true, 
         navigatorTileSources: {
             type: 'image',
@@ -309,7 +309,13 @@
         }, 100);
 
         const containerAspect = viewport.getAspectRatio();
-        viewport.fitBounds(new OpenSeadragon.Rect(0, 0, 1, 1 / containerAspect), true);
+        if (isMobile) {
+            const initialView = new OpenSeadragon.Rect(0, 0, 0.2, 0.2);
+            viewport.fitBounds(initialView, true);
+        } else {
+            const containerAspect = viewer.viewport.getAspectRatio();
+            viewer.viewport.fitBounds(new OpenSeadragon.Rect(0, 0, 1, 1 / containerAspect), true);
+        }
         
         updateAxis();
     });
