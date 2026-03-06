@@ -130,12 +130,12 @@
         .cat-label { 
             padding-left: 5px;
             border-left: 2px solid #333;
-            font-size: 19px;
+            font-size: 12px;
         }
 
         #navigator-box {
             height: 90% !important;
-            aspect-ratio: 10701 / 2585;
+            aspect-ratio: 19583 / 15000;
             display: flex !important;
             justify-content: flex-start !important; 
             align-items: center;
@@ -170,7 +170,7 @@
 
             #left-axis { width: 45px; }
             .year-label { font-size: 14px; right: 8px; }
-            .cat-label { font-size: 16px; }
+            .cat-label { font-size: 12px; }
         }
     </style>
 </head>
@@ -196,21 +196,21 @@
     console.log(window.innerWidth)
     const timelineData = {
          years: [
-            { label: "1501", y: 0.02 },
-            { label: "1502", y: 0.07 },
-            { label: "1503", y: 0.115 },
-            { label: "1504", y: 0.165 },
-            { label: "1505", y: 0.21 }
+            { label: "1501", y: 0.08 },
+            { label: "1502", y: 0.22 },
+            { label: "1503", y: 0.37 },
+            { label: "1504", y: 0.51 },
+            { label: "1505", y: 0.65 }
         ],
 
         categories: [
-            { label: "History / Politic", x: 0 },
-            { label: "Literature / Theater", x: 0.165 },
-            { label: "Visual Arts", x: 0.324 },
-            { label: "Religion, Philosophy, Learning", x: 0.443 },
-            { label: "Science/Technology/Growth", x: 0.583 },
-            { label: "Music", x: 0.742 },
-            { label: "Science", x: 0.858 }
+            { label: "History / Politic", x: 0.005 },
+            { label: "Literature / Theater", x: 0.188 },
+            { label: "Visual Arts", x: 0.326 },
+            { label: "Religion, Philosophy, Learning", x: 0.465 },
+            { label: "Science/Technology/Growth", x: 0.603 },
+            { label: "Music", x: 0.740 },
+            { label: "Science", x: 0.832 }
         ]
     };
 
@@ -223,7 +223,8 @@
         springStiffness: 12,
         visibilityRatio: 1.0,
         constrainDuringPan: true,
-        minZoomImageRatio: isMobile ? 5.0 : 1.0,
+        defaultZoomLevel: isMobile ? 5 : 2,
+        minZoomImageRatio: isMobile ? 0.8 : 0.4,
         autoResize: true, 
         navigatorTileSources: {
             type: 'image',
@@ -271,11 +272,22 @@
         if (!viewer.viewport) return;
         const viewport = viewer.viewport;
         const bounds = viewport.getBounds();
-
-        if (bounds.y < 0) {
-            viewport.fitBounds(new OpenSeadragon.Rect(bounds.x, 0, bounds.width, bounds.height), false);
+        let newX = bounds.x;
+        let newY = bounds.y;
+        let changed = false;
+        if (bounds.x < 0) {
+            newX = 0;
+            changed = true;
         }
-
+        if (bounds.y < 0) {
+            newY = 0;
+            changed = true;
+        }
+        
+        if (changed) {
+            viewport.fitBounds(new OpenSeadragon.Rect(newX, newY, bounds.width, bounds.height), false);
+            // viewport.applyConstraints(); 
+        }
         window.requestAnimationFrame(() => {
             timelineData.years.forEach(d => {
                 if (d.el) { 
