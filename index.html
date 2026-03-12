@@ -8,12 +8,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
     <style>
         :root { 
-            --axis-bg: #fff; 
-            --text-color: #333;
-            --line-color: #eee;
+            --axis-bg: #000; 
+            --text-color: #ddd;
+            --line-color: #ddd;
             --header-height: 80px;
-            /* 定义全局字体变量 */
             --font-main: 'Crimson Text', "Times New Roman", serif;
+            --accent-color: #ddd;
         }
         
         body, html { 
@@ -22,7 +22,7 @@
             width: 100%; 
             height: 100%; 
             overflow: hidden; 
-            background: #fff; 
+            background: #000; 
             font-family: var(--font-main); 
         }
         
@@ -40,8 +40,8 @@
             display: flex;
             align-items: baseline;
             padding: 20px 80px;
-            border-bottom: 2px solid #000;
-            background: #fff;
+            border-bottom: 2px solid var(--accent-color);
+            background: #000;
             z-index: 102;
         }
 
@@ -50,7 +50,7 @@
             font-family: var(--font-main);
             font-size: 38px;
             font-weight: 700;
-            color: #4a2c1d;
+            color: #d4af37;
             margin-right: 30px;
             letter-spacing: 0.5px;
         }
@@ -58,7 +58,7 @@
         #header p {
             margin: 0;
             font-size: 20px;
-            color: #555;
+            color:  #ddd
         }
 
         #top-axis { 
@@ -69,7 +69,7 @@
             overflow: visible; 
             display: flex;
             align-items: center; 
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--line-color)
         }
 
         #left-axis { 
@@ -83,7 +83,7 @@
         #corner { 
             grid-column: 1;
             grid-row: 2;
-            background: #fff; 
+            background: #000; 
             z-index: 101;
         }
         canvas {
@@ -93,7 +93,7 @@
         #viewer-container {
             grid-column: 2;
             grid-row: 3;
-            background: #fff;
+            background: #000;
             position: relative;
             outline: none !important;
         }
@@ -104,8 +104,8 @@
         #bottom-nav-row {
             grid-column: 1 / span 2;
             grid-row: 4;
-            background: #fff;
-            border-top: 1px solid #333;
+            background: #000;
+            border-top: 1px solid var(--line-color);
             display: flex; 
             justify-content: flex-start;
             align-items: center;
@@ -129,21 +129,43 @@
         
         .cat-label { 
             padding-left: 5px;
-            border-left: 2px solid #333;
-            font-size: 12px;
+            border-left: 2px solid var(--line-color);
+            font-size: 13px;
         }
+    #bottom-nav-row {
+        position: relative;
+        grid-column: 1 / span 2;
+        grid-row: 4;
+        background: #000;
+        border-top: 1px solid var(--line-color);
+        width: 100%;
+        height: 15vh; 
+        margin: 0;
+        padding: 0;
+    }
 
-        #navigator-box {
-            height: 90% !important;
-            aspect-ratio: 19583 / 15000;
-            display: flex !important;
-            justify-content: flex-start !important; 
-            align-items: center;
-            top: 5%;
-            margin-left: 1% !important;
-            background-color: #fff !important;
-        }
+    #navigator-box {
+        position: absolute;
+        left: 3%;       
+        top: 50%;         
+        transform: translateY(-50%); 
+        
+        height: 85% !important; 
+        width: auto; 
+        max-width: 25vw;
+        aspect-ratio: 19583 / 15000;
+        overflow: hidden;
+    }
 
+    #right-bottom-img {
+        position: absolute; 
+        right: 3%;        
+        top: 50%;         
+        transform: translateY(-50%); 
+        height: 85%;    
+        width: auto;
+        display: block;
+    }
         @media (max-width: 767px) {
             #main-layout {
                 grid-template-rows: 100px 40px 1fr 0px; 
@@ -188,6 +210,7 @@
     <div id="viewer-container"></div>
     <div id="bottom-nav-row">
         <div id="navigator-box"></div>
+        <img src="right_bottom.png" id="right-bottom-img" alt="History Details">
     </div>
 </div>
 
@@ -239,8 +262,8 @@
         showNavigationControl: false,
         showNavigator: !isMobile,
         navigatorId: isMobile ? null : "navigator-box",
-        navigatorDisplayRegionColor: 'rgba(255, 0, 0, 0.5)',
-        navigatorBorderColor: '#ff0000',                
+        navigatorDisplayRegionColor: '#d4af37',
+        navigatorBorderColor: '#d4af37',                
         navigatorDisplayRegionBorderWidth: 2,            
     });
 
